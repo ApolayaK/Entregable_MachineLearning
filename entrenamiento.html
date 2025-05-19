@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clasificador de Formas</title>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.4.0/lib/p5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ml5@0.12.2/dist/ml5.min.js"></script>
+</head>
+<body>
+<script>
+  let circles = [];
+  let squares = [];
+  let triangles = [];
+
+  // Objeto ml5
+  let ShapeClassifier;
+
+  function preload() {
+    for (let i = 0; i < 100; i++) {
+      let index = nf((i + 1), 3, 0); // 001, 002, ..., 100
+      circles[i] = loadImage(`data/circle${index}.png`);
+      squares[i] = loadImage(`data/square${index}.png`);
+      triangles[i] = loadImage(`data/triangle${index}.png`);
+    }
+  }
+
+  function setup() {
+   
+
+    // Parámetros del clasificador
+    let options = {
+      inputs: [64, 64, 4], // 64x64 imágenes con 4 canales (RGBA)
+      task: 'imageClassification',
+      debug: true
+    };
+
+    // Inicialización de la red neuronal
+    ShapeClassifier = ml5.neuralNetwork(options);
+
+    // Añadir datos
+    for (let i = 0; i < 100; i++) {
+      
+      ShapeClassifier.addData({ image: circles[i] }, { label: "circulo" });
+      ShapeClassifier.addData({ image: squares[i] }, { label: "cuadrado" });
+      ShapeClassifier.addData({ image: triangles[i] }, { label: "triangulo" });
+    }
+
+    // Normalización y entrenamiento
+    ShapeClassifier.normalizeData();
+    ShapeClassifier.train({ epochs: 50 }, finishedTraining);
+  }
+
+  function finishedTraining() {
+    console.log("Entrenamiento finalizado.");
+    // Aquí podrías guardar el modelo o probar una predicción
+    ShapeClassifier.save();
+  }
+</script>
+</body>
+</html>
