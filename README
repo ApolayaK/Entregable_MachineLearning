@@ -2,7 +2,7 @@
 
 Este proyecto es una aplicación web que permite dibujar triángulos a mano alzada y clasificarlos en dos categorías: triángulo rectángulo o triángulo acutángulo, utilizando un modelo de inteligencia artificial basado en ml5.js y p5.js.
 
-![Diagrama del modelo](/images/model_diagram.png)
+![Diagrama del modelo](images/model_diagram.png)
 
 ## Tecnologías usadas
 
@@ -30,7 +30,7 @@ Este proyecto es una aplicación web que permite dibujar triángulos a mano alza
 
 ## Estructura del proyecto
 
-![Estructura del proyecto](/images/estructura.png)
+![Estructura del proyecto](images/estructura.png)
 
 
 
