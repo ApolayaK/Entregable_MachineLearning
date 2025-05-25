@@ -1,43 +1,28 @@
-# Bienvenido
-## Mi primer repositorio 
-### Creado por Apolaya uwu
+# Clasificador de Triángulos
 
-# LENGUAJE MARKDOWN
+Este proyecto es una aplicación web que permite dibujar triángulos a mano alzada y clasificarlos en dos categorías: triángulo rectángulo o triángulo acutángulo, utilizando un modelo de inteligencia artificial basado en ml5.js y p5.js.
 
-Teconologías utilizadas:
-* HTML
-* CSS
-* Javascript
+![Diagrama del modelo](https://github.com/ApolayaK/Entregable_MachineLearning/blob/main/images/model_diagram.png?raw=true)
 
-_SENATI CHINCHA_
 
-**Ingeniería de Sofware**
+## Tecnologías usadas
 
->**Importante**: Tener en cuenta ...
+- HTML5, CSS3 y JavaScript
+- [Bootstrap 5](https://getbootstrap.com/)
+- [p5.js](https://p5js.org/)
+- [ml5.js](https://ml5js.org/)
+- Modelo de red neuronal personalizado para clasificación de imágenes
 
-```js
-function saludar (){
-  alerta("Te saludo")
-}
-```
+## Características
 
-```html
-<table>
-  <thead></thead>
-  <tbody></tbody>
-  <tfoot></tfoot>
-</table>
-```
+- Interfaz oscura y responsiva.
+- Lienzo para dibujar triángulos con el mouse.
+- Botón para limpiar el lienzo.
+- Clasificación en tiempo real del dibujo con retroalimentación visual y de voz.
+- Barra de progreso que muestra la confianza de la predicción.
+- Visualización de triángulos de referencia.
 
-```php
-$datos = [
-  "calve" => "valor"
-]
-```
+## Estructura del proyecto
 
-Redes sociales:
-* [TikTok] (https://tiktok.com)
-* [Intagram] (https://instagram.com)
-* [YouTube] (https://youtube.com)
+![Estructura del proyecto](https://github.com/ApolayaK/Entregable_MachineLearning/blob/main/images/estructura.png?raw=true)
 
-![imagen] (https://i.ytimg.com/vi/MjNlx4s9KI4/sddefault.jpg)
