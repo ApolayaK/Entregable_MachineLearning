@@ -1,60 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clasificador de Formas</title>
+  <title>Clasificador de Triángulos</title>
   <script src="https://cdn.jsdelivr.net/npm/p5@1.4.0/lib/p5.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ml5@0.12.2/dist/ml5.min.js"></script>
 </head>
 <body>
 <script>
-  let circles = [];
-  let squares = [];
-  let triangles = [];
+  let rectangulos = [];
+  let acutangulos = [];
 
-  // Objeto ml5
   let ShapeClassifier;
 
   function preload() {
     for (let i = 0; i < 100; i++) {
       let index = nf((i + 1), 3, 0); // 001, 002, ..., 100
-      circles[i] = loadImage(`data/circle${index}.png`);
-      squares[i] = loadImage(`data/square${index}.png`);
-      triangles[i] = loadImage(`data/triangle${index}.png`);
+
+      rectangulos.push(loadImage(`data/tri_rect_01_${index}.png`));
+      rectangulos.push(loadImage(`data/tri_rect_02_${index}.png`));
+      rectangulos.push(loadImage(`data/tri_rect_03_${index}.png`));
+      rectangulos.push(loadImage(`data/tri_rect_04_${index}.png`));
+
+      acutangulos.push(loadImage(`data/tri_acu_01_${index}.png`));
+      acutangulos.push(loadImage(`data/tri_acu_02_${index}.png`));
     }
   }
 
   function setup() {
-   
+    createCanvas(64, 64);
+    background(255);
 
-    // Parámetros del clasificador
     let options = {
-      inputs: [64, 64, 4], // 64x64 imágenes con 4 canales (RGBA)
+      inputs: [64, 64, 4], // RGBA
       task: 'imageClassification',
       debug: true
     };
 
-    // Inicialización de la red neuronal
     ShapeClassifier = ml5.neuralNetwork(options);
 
-    // Añadir datos
-    for (let i = 0; i < 100; i++) {
-      
-      ShapeClassifier.addData({ image: circles[i] }, { label: "circulo" });
-      ShapeClassifier.addData({ image: squares[i] }, { label: "cuadrado" });
-      ShapeClassifier.addData({ image: triangles[i] }, { label: "triangulo" });
+    // Añadir datos de entrenamiento
+    for (let i = 0; i < rectangulos.length; i++) {
+      ShapeClassifier.addData({ image: rectangulos[i] }, { label: "rectangulo" });
     }
 
-    // Normalización y entrenamiento
+    for (let i = 0; i < acutangulos.length; i++) {
+      ShapeClassifier.addData({ image: acutangulos[i] }, { label: "acutangulo" });
+    }
+
     ShapeClassifier.normalizeData();
     ShapeClassifier.train({ epochs: 50 }, finishedTraining);
   }
 
   function finishedTraining() {
-    console.log("Entrenamiento finalizado.");
-    // Aquí podrías guardar el modelo o probar una predicción
-    ShapeClassifier.save();
+    console.log("✅ Entrenamiento completado.");
+    ShapeClassifier.save(); // Esto descarga el modelo en tu navegador
   }
 </script>
 </body>

@@ -1,96 +1,340 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Clasificador de Triángulos</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/p5@1.4.0/lib/p5.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ml5@0.12.2/dist/ml5.min.js"></script>
 
-</head>
-<body>
   <style>
-    body{
-      background-color:bisque;
+    body {
+      background: #f0f2f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 15px;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      align-items: flex-start;
+    }
+
+    .container {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 3px 10px rgb(0 0 0 / 0.1);
+      max-width: 600px;
+      width: 100%;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      font-weight: 600;
+      margin-bottom: 25px;
+      color: #2c3e50;
+    }
+
+    /* Layout responsive */
+    .main-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .left-column, .right-column {
+      flex: 1 1 250px;
+      max-width: 250px;
+    }
+
+    /* Tarjetas de triángulo pequeñas */
+    .triangle-card {
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 18px;
+      background: #f9fafb;
+      border: 1.5px solid #ccc;
+      text-align: center;
+      transition: border-color 0.3s ease, background-color 0.3s ease;
+      user-select: none;
+      cursor: default;
+    }
+    .triangle-card strong {
+      display: block;
+      font-size: 1.1rem;
+      color: #34495e;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .triangle-card canvas {
+      border-radius: 8px;
+      border: 1.5px solid #34495e;
+      background: #ecf0f1;
+      width: 60px !important;
+      height: 60px !important;
+    }
+    .triangle-card.active {
+      border-color: #27ae60;
+      background-color: #e8f5e9;
+      color: #14532d;
+      font-weight: 600;
+      box-shadow: 0 0 10px #27ae601a;
+    }
+
+    /* Canvas de dibujo (más pequeño) */
+    #canvas-holder canvas {
+      border-radius: 15px;
+      border: 2.5px solid #34495e;
+      background: #fff;
+      box-shadow: 0 4px 12px rgba(52, 73, 94, 0.2);
+      max-width: 100%;
+      height: auto !important;
+      cursor: crosshair;
+      display: block;
+      margin: 0 auto 15px auto;
+      width: 280px !important;
+      height: 280px !important;
+    }
+
+    /* Botones */
+    .btn {
+      border-radius: 25px;
+      padding: 8px 20px;
+      font-weight: 600;
+      min-width: 110px;
+      margin-right: 10px;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    #clearButton {
+      background-color: #e74c3c;
+      border: none;
+      color: #fff;
+    }
+    #clearButton:hover {
+      background-color: #c0392b;
+      box-shadow: 0 4px 15px rgba(192, 57, 43, 0.4);
+    }
+    #classifyButton {
+      background-color: #2980b9;
+      border: none;
+      color: #fff;
+    }
+    #classifyButton:hover {
+      background-color: #1c5985;
+      box-shadow: 0 4px 15px rgba(28, 89, 133, 0.5);
+    }
+
+    /* Resultado */
+    #labelResult {
+      font-weight: 600;
+      color: #2c3e50;
+      min-height: 40px;
+      text-align: center;
+      margin-top: 20px;
+      user-select: none;
+      font-size: 1.2rem;
+    }
+
+    /* Barra de progreso */
+    .progress {
+      height: 22px;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 8px;
+      box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.1);
+    }
+    .progress-bar {
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 22px;
+      text-align: center;
+      transition: width 0.4s ease;
+    }
+
+    /* Media queries para móviles */
+    @media (max-width: 576px) {
+      .main-row {
+        flex-direction: column;
+        align-items: center;
+      }
+      .left-column, .right-column {
+        max-width: 100%;
+        flex: none;
+      }
+      #canvas-holder canvas {
+        width: 90vw !important;
+        height: 90vw !important;
+        max-width: none;
+      }
+      .btn {
+        width: 48%;
+        margin-bottom: 10px;
+        margin-right: 0 !important;
+      }
     }
   </style>
-  
+</head>
+<body>
+  <div class="container" role="main" aria-label="Clasificador de Triángulos">
+    <h1>Clasificador de Triángulos</h1>
+
+    <div class="main-row">
+      <div class="left-column">
+        <div id="rectanguloCard" class="triangle-card" title="Triángulo Rectángulo">
+          <strong>Rectángulo</strong>
+          <canvas id="canvasRect" width="64" height="64"></canvas>
+        </div>
+
+        <div id="acutanguloCard" class="triangle-card" title="Triángulo Acutángulo">
+          <strong>Acutángulo</strong>
+          <canvas id="canvasAcu" width="64" height="64"></canvas>
+        </div>
+      </div>
+
+      <div class="right-column text-center">
+        <div id="canvas-holder"></div>
+
+        <button id="clearButton" class="btn">Limpiar</button>
+        <button id="classifyButton" class="btn">Clasificar</button>
+
+        <div id="labelResult" aria-live="polite" aria-atomic="true">Esperando dibujo...</div>
+
+        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div id="confidenceBar" class="progress-bar bg-danger" style="width: 0%;">0%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
-    //Variables
-    let shapeClassifier //Red Neuronal
-    let canvas  //Lienzo
-    let resultDiv //Capa => Mostrar Resultados
-    let inputImage //Trasladar la imagen CANVAS => RED NURONAL
-    let clearButton //Boton que reinicia el lienzo
+    let shapeClassifier;
+    let canvas, inputImage;
+    let labelDiv, confidenceBar;
+    let rectCard, acuCard;
 
-    function setup(){
-      canvas = createCanvas(400, 400)
-      background(255)
+    function setup() {
+      canvas = createCanvas(400, 400);
+      canvas.parent('canvas-holder');
+      background(255);
 
-      //Red Neuronal
-      let options = {
+      inputImage = createGraphics(64, 64);
+
+      labelDiv = select('#labelResult');
+      confidenceBar = select('#confidenceBar');
+      rectCard = select('#rectanguloCard');
+      acuCard = select('#acutanguloCard');
+
+      drawReferenceTriangles();
+
+      const options = {
         inputs: [64, 64, 4],
-        task  : 'imageClassification' 
-      }
+        task: 'imageClassification'
+      };
 
-      //Inicializar
-      shapeClassifier = ml5.neuralNetwork(options)
+      shapeClassifier = ml5.neuralNetwork(options);
 
-      //Utilizar los archivos del modelo entrenado
       const modelDetails = {
         model: 'model/model.json',
         metadata: 'model/model_meta.json',
         weights: 'model/model.weights.bin'
+      };
+
+      shapeClassifier.load(modelDetails, () => {
+        labelDiv.html("Modelo cargado correctamente. Dibuja un triángulo.");
+      });
+
+      select('#clearButton').mousePressed(() => {
+        background(255);
+        labelDiv.html("Lienzo limpio.");
+        confidenceBar.html('0%');
+        confidenceBar.style('width', '0%');
+        confidenceBar.removeClass('bg-success bg-warning bg-danger');
+        confidenceBar.addClass('bg-danger');
+        rectCard.removeClass('active flash');
+        acuCard.removeClass('active flash');
+      });
+
+      select('#classifyButton').mousePressed(() => {
+        classifyImage();
+      });
+    }
+
+    function classifyImage() {
+      inputImage.copy(canvas, 0, 0, 400, 400, 0, 0, 64, 64);
+      shapeClassifier.classify({ image: inputImage }, (err, results) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+
+        const label = results[0].label.toLowerCase();
+        const confidence = results[0].confidence;
+        const percentage = (confidence * 100).toFixed(1);
+
+        labelDiv.html(`Etiqueta: <strong>${label}</strong>`);
+        confidenceBar.html(`${percentage}%`);
+        confidenceBar.style('width', `${percentage}%`);
+        confidenceBar.attribute('aria-valuenow', percentage);
+
+        confidenceBar.removeClass('bg-success bg-warning bg-danger');
+        if (confidence > 0.7) {
+          confidenceBar.addClass('bg-success');
+        } else if (confidence > 0.4) {
+          confidenceBar.addClass('bg-warning');
+        } else {
+          confidenceBar.addClass('bg-danger');
+        }
+
+        rectCard.removeClass('active flash');
+        acuCard.removeClass('active flash');
+
+        void rectCard.elt.offsetWidth;
+        void acuCard.elt.offsetWidth;
+
+        if (label.includes("rect")) {
+          rectCard.addClass('active flash');
+        } else if (label.includes("acu")) {
+          acuCard.addClass('active flash');
+        }
+      });
+    }
+
+    function draw() {
+      if (mouseIsPressed) {
+        strokeWeight(8);
+        stroke(50);
+        line(mouseX, mouseY, pmouseX, pmouseY);
       }
-
-      //Bton para reiniciar el lienzo
-      clearButton = createButton('Limpiar')
-      clearButton.mousePressed(() => {
-        background(255)
-      })
-
-      //Texto de los resultados
-      resultDiv = createDiv('Cargando el modelo...')
-
-      //Objeto => Almacenar la imagen introducimos Lienzo
-      inputImage = createGraphics(64, 64)
-
-      //Cargar Red Neuronal
-      shapeClassifier.load(modelDetails, modelLoaded)
     }
 
-    function modelLoaded(){
-      console.log("Modelo Cargado")
-      classifyImage()
+    function drawReferenceTriangles() {
+      let ctxRect = document.getElementById('canvasRect').getContext('2d');
+      let ctxAcu = document.getElementById('canvasAcu').getContext('2d');
+
+      ctxRect.fillStyle = 'black';
+      ctxRect.beginPath();
+      ctxRect.moveTo(5, 58);
+      ctxRect.lineTo(5, 5);
+      ctxRect.lineTo(58, 58);
+      ctxRect.closePath();
+      ctxRect.fill();
+
+      ctxAcu.fillStyle = 'black';
+      ctxAcu.beginPath();
+      ctxAcu.moveTo(10, 58);
+      ctxAcu.lineTo(32, 5);
+      ctxAcu.lineTo(54, 58);
+      ctxAcu.closePath();
+      ctxAcu.fill();
     }
 
-    function classifyImage(){
-      //Reescalar la imagen de 400x400 => 64x64
-      inputImage.copy(canvas, 0, 0, 400, 400, 0, 0, 64, 64)
-      shapeClassifier.classify({image: inputImage}, goResults)
-    }
-
-    function goResults(err, result){
-      if(err){
-        console.err(err)
-        return;
-      }
-        //No hubo error => Obtener resutdaos
-        let etiqueta = result[0].label
-        let confianza = result[0].confidence
-        resultDiv.html(etiqueta + " - " + confianza)
-        classifyImage()
-    }
-
-    function draw(){
-      //Mouse pressed es el boton primario del mouse
-      if(mouseIsPressed){
-        strokeWeight(8)
-        line(mouseX, mouseY, pmouseX, pmouseY)
-      }
-    }
-
+    window.setup = setup;
   </script>
 
 </body>
